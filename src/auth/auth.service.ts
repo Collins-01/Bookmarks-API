@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
@@ -22,14 +26,13 @@ export default class AuthService {
       },
     });
     if (!user) {
-      throw new ForbiddenException('Credentials Incorrect');
+      throw new NotFoundException('No user found.');
     }
     // Check password
     const pwMatches = await argon.verify(user.hash, dto.password);
     if (!pwMatches) {
-      throw new ForbiddenException('Credentials Incorrect');
+      throw new ForbiddenException('Incorrect Credentials.');
     }
-    // retrun user
 
     return this.signToken(user.id, user.email);
   }
@@ -57,7 +60,7 @@ export default class AuthService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials have been taken');
+          throw new ForbiddenException('A user with these credentials already exists.');
         }
       }
       throw error;
