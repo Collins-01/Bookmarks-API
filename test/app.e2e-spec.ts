@@ -1,6 +1,5 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { application } from 'express';
 import { AppModule } from 'src/app.module';
 
 describe('App e2e', () => {

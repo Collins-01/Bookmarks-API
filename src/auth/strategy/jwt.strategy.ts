@@ -21,6 +21,7 @@ export class JWTStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
     // TODO: Implement `Delete The has before sending to the user.`
     // delete user?.hash;
+    // const {hash, ...rest} = user;
 
     return user;
   }
