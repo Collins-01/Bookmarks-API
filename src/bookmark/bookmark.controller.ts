@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
@@ -19,8 +27,8 @@ export class BookmarkController {
     return await this.bookmarkService.deleteBookmark(id);
   }
   @Get(':id')
-  async getSingleBookmark(@Body() id: number) {
-    return await this.bookmarkService.getBookMark(id);
+  async getSingleBookmark(@Param('id') id: string) {
+    return await this.bookmarkService.getBookMark(+id);
   }
   @Get('all')
   async getAllBookmarks() {

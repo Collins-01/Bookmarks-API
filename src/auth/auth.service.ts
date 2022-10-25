@@ -9,7 +9,6 @@ import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-// import console from 'console';
 
 @Injectable()
 export default class AuthService {
@@ -48,21 +47,23 @@ export default class AuthService {
       const user = await this.prisma.user.create({
         data: {
           email: dto.email,
-          hash,
+          hash: 'hash',
         },
-        select: {
-          id: true,
-          email: true,
-          // hash: true,
-        },
+        // select: {
+        //   id: true,
+        //   email: true,
+        //   // hash: true,
+        // },
       });
 
-      return this.signToken(user.id, user.email);
+      // return this.signToken(user.id, user.email);
     } catch (error) {
-      console.log(`Error Creating User: ${error}`)
+      console.log(`Error Creating User: ${error}`);
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ForbiddenException('A user with these credentials already exists.');
+          throw new ForbiddenException(
+            'A user with these credentials already exists.',
+          );
         }
       }
       throw error;
