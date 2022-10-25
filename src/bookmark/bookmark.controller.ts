@@ -9,24 +9,24 @@ import { BookmarkDto } from './dto';
 @UseGuards(JwtGuard)
 export class BookmarkController {
   constructor(private bookmarkService: BookmarkService) {}
-  @Post()
+  @Post('create')
   async createBookmark(@Body() bookmarkDto: BookmarkDto) {
     return await this.bookmarkService.createBookmark(bookmarkDto);
   }
 
-  @Delete()
+  @Delete('delete')
   async deleteBookmark(@Body() id: number) {
     return await this.bookmarkService.deleteBookmark(id);
   }
-  @Get()
+  @Get(':id')
   async getSingleBookmark(@Body() id: number) {
     return await this.bookmarkService.getBookMark(id);
   }
-  @Get()
+  @Get('all')
   async getAllBookmarks() {
     return this.bookmarkService.getAllBookmarks();
   }
-  @Get()
+  @Get('me')
   async getMyBookMarks(@GetUser() user: User) {
     return await this.bookmarkService.getMyBookMarks(user.id);
   }

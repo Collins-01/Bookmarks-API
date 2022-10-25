@@ -1,6 +1,5 @@
 import { Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { Request } from 'express';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from '../auth/guard';
 
@@ -9,6 +8,7 @@ import { JwtGuard } from '../auth/guard';
 export class UserController {
   @Get('me')
   getMe(@GetUser() user: User) {
+    type userWithoutHash = Omit<User, 'hash'>;
     return user;
   }
 
