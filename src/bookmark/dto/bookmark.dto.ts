@@ -15,7 +15,5 @@ export class BookmarkDto {
   @IsString()
   link: string;
 
-  @IsNotEmpty()
-  @IsNumber()
-  userId: number;
+  
 }

@@ -17,6 +17,7 @@ bootstrap();
 /*
    Run application :npm run start:dev
   Configure DB : docker compose up dev-db -d
+  prisma:dev:deploy
    Start Prisma Studio:  npx prisma studio
 
 */

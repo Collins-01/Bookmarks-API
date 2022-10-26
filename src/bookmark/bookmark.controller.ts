@@ -18,8 +18,8 @@ import { BookmarkDto } from './dto';
 export class BookmarkController {
   constructor(private bookmarkService: BookmarkService) {}
   @Post('create')
-  async createBookmark(@Body() bookmarkDto: BookmarkDto) {
-    return await this.bookmarkService.createBookmark(bookmarkDto);
+  async createBookmark(@Body() bookmarkDto: BookmarkDto, @GetUser() user: User) {
+    return await this.bookmarkService.createBookmark(bookmarkDto,user.id);
   }
 
   @Delete('delete')
