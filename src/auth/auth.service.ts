@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthDto } from './dto';
+import { LoginDTO, RegisterDTO } from './dto';
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
@@ -20,7 +20,7 @@ export default class AuthService {
     private config: ConfigService,
   ) {}
   // * LOGIN
-  async login(dto: AuthDto) {
+  async login(dto: LoginDTO) {
     // Find User
     const user = await this.prisma.user.findUnique({
       where: {
@@ -46,22 +46,25 @@ export default class AuthService {
     };
   }
   // * REGISTER
-  async signUp(dto: AuthDto) {
+  async signUp(dto: RegisterDTO) {
     // Generate Hash
     //  Save user
     // Return User
     try {
       const hash = await argon.hash(dto.password);
-      console.log(`Hashed Password : ${hash}`);
       const user = await this.prisma.user.create({
         data: {
           email: dto.email,
           hash: hash,
+          lastName: dto.lastName,
+          firstName: dto.firstName,
         },
         select: {
           id: true,
           email: true,
-          // hash: true,
+          firstName: true,
+          lastName: true,
+          
         },
       });
       const token = await this.signToken(user.id, user.email);
@@ -79,6 +82,21 @@ export default class AuthService {
       }
       throw new Error(error);
     }
+  }
+
+  // * Forgot Password
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    return {
+      message: `An OTP has been sent to ${email}.`,
+    };
   }
 
   // * CREATES A TOKEN AFTER A USER LOGS IN THE APPLICATION
