@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -9,6 +10,7 @@ import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { User } from '@prisma/client';
 
 @Injectable()
 export default class AuthService {
@@ -33,40 +35,49 @@ export default class AuthService {
     if (!pwMatches) {
       throw new ForbiddenException('Incorrect Credentials.');
     }
-
-    return this.signToken(user.id, user.email);
+    const token = await this.signToken(user.id, user.email);
+    const partialUser: Partial<User> = {
+      ...user,
+    };
+    delete partialUser['hash'];
+    return {
+      ...token,
+      ...partialUser,
+    };
   }
   // * REGISTER
   async signUp(dto: AuthDto) {
     // Generate Hash
     //  Save user
-    // Retrun User
+    // Return User
     try {
       const hash = await argon.hash(dto.password);
       console.log(`Hashed Password : ${hash}`);
       const user = await this.prisma.user.create({
         data: {
           email: dto.email,
-          hash: 'hash',
+          hash: hash,
         },
-        // select: {
-        //   id: true,
-        //   email: true,
-        //   // hash: true,
-        // },
+        select: {
+          id: true,
+          email: true,
+          // hash: true,
+        },
       });
-
-      // return this.signToken(user.id, user.email);
+      const token = await this.signToken(user.id, user.email);
+      return {
+        token,
+        ...user,
+      };
     } catch (error) {
       console.log(`Error Creating User: ${error}`);
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ForbiddenException(
-            'A user with these credentials already exists.',
-          );
-        }
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException(`A user with ${dto.email} already exists.`);
       }
-      throw error;
+      throw new Error(error);
     }
   }
 
