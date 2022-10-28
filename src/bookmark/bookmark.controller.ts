@@ -5,24 +5,24 @@ import {
   Get,
   Param,
   Post,
-  Request,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
-import { Request as reqst } from 'express';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { BookmarkService } from './bookmark.service';
-import { BookmarkDto } from './dto';
+import { BookmarkDTO } from './dto';
 
 @Controller('bookmarks')
+@ApiTags('Bookmarks')
 @UseGuards(JwtGuard)
 export class BookmarkController {
   constructor(private bookmarkService: BookmarkService) {}
   @Post('create')
   // ✅
   async createBookmark(
-    @Body() bookmarkDto: BookmarkDto,
+    @Body() bookmarkDto: BookmarkDTO,
     @GetUser() user: User,
   ) {
     return await this.bookmarkService.createBookmark(bookmarkDto, user.id);

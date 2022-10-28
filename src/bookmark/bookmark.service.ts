@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { BookmarkDto } from './dto';
+import { BookmarkDTO } from './dto';
 
 @Injectable()
 export class BookmarkService {
   constructor(private prismaService: PrismaService) {}
   // *Create a new bookmark
   // ✅
-  async createBookmark(dto: BookmarkDto, userId: number) {
+  async createBookmark(dto: BookmarkDTO, userId: number) {
     const bookmark = await this.prismaService.bookmark.create({
       data: {
         link: dto.link,
