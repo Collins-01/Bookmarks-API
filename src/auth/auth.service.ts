@@ -11,6 +11,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export default class AuthService {
@@ -18,6 +19,7 @@ export default class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
+    private mailService: MailService,
   ) {}
   // * LOGIN
   async login(dto: LoginDTO) {
@@ -64,10 +66,10 @@ export default class AuthService {
           email: true,
           firstName: true,
           lastName: true,
-          
         },
       });
       const token = await this.signToken(user.id, user.email);
+
       return {
         token,
         ...user,
@@ -94,6 +96,7 @@ export default class AuthService {
     if (!user) {
       throw new NotFoundException();
     }
+
     return {
       message: `An OTP has been sent to ${email}.`,
     };
